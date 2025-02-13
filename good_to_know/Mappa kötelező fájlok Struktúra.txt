@@ -1,0 +1,39 @@
+Rednszerfejlesztés beadandó/
+│
+├── README.md  
+├── API_dokumentacio.md  
+│
+├── model_training.ipynb
+├── main.py  (vagy app.py)
+│
+├── config.json
+├── model.safetensors
+├── training_args.bin
+
+
+
+Fájl struktúra:
+
+- README.md: Projekt bemutatása, implementáció bemutatása.
+- API_documentation.md: API dokumentációja, a kérdésekre adott válaszokkal.
+
+- model_training.ipynb: A Jupyter notebook, amely tartalmazza a modell betanításának lépéseit.
+- main.py vagy app.py: Az API implementációja.
+
+- config.json: A modell konfigurációs fájlja.
+- model.safetensors: A betanított modell súlyai.
+- training_args.bin: A betanítási paraméterek.
+
+
+
+Dokumentáció tartalma:
+
+README.md vagy Projekt_leiras.docx:
+- Projekt bemutatása: Mi a projekt célja, milyen problémát old meg.
+- Implementáció bemutatása: Hogyan készült a projekt, milyen eszközöket és technológiákat  használtál.
+
+API_documentation.md vagy API_dokumentacio.docx:
+- API dokumentációja: Hogyan lehet használni az API-t, milyen végpontok vannak, milyen paramétereket vár és milyen választ ad.
+- Training set, LLM promptok verziózása hogyan történik?
+- Forráskódok, modellek tárolása hol történik?
+- Modell monitorozása hogyan történik? Milyen KPI-kat érdemes figyelni? Hogyan?

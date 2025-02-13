@@ -1,0 +1,226 @@
+# 1. Projekt bemutatása
+
+  Ez a projekt egy senitmentanalysis modellt, ami képes különböző szövegek  azonosítására. Python és a Transformers könyvtár segítségével készült. A modellt egy BERT-alapú előre betanított modell finomhangolásával hoztam létre. Az adatokat a Kaggle-ről származó Reddit sentimentanalysis datasetet használtam fel.
+
+# 2. Implementáció bemutatása
+
+
+2.1. Szükséges csomagok telepítése
+
+
+!pip install datasets
+!pip install transformers[torch]
+!pip install accelerate
+!pip install accelerate -U
+!pip install datasets transformers accelerate -U
+!pip install river
+!pip install datasets transformers[torch] accelerate
+!pip install datasets transformers[torch] accelerate river
+
+
+2.2. Adatok beolvasása és előkészítése
+
+
+import pandas as pd
+from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
+from sklearn.model_selection import train_test_split
+from datasets import Dataset
+import torch
+
+# Adatok beolvasása, kódolási hibák kezelése
+file_df = pd.read_csv("file.csv", delimiter=';')
+
+# Ellenőrizzük az oszlopok nevét és szükség esetén nevezzük át
+file_df = file_df.rename(columns={'text_column_name': 'text', 'label_column_name': 'label'})
+
+# Bemenetek és címkék listába konvertálása
+texts = file_df['text'].tolist()
+labels = file_df['label'].tolist()
+
+# Ellenőrizzük, hogy a címkék numerikusak-e
+file_df['label'] = pd.Categorical(file_df['label']).codes
+
+print("Oszlopok a fajlban:", file_df.columns)
+
+
+2.3. Tokenizer és modell betöltése
+
+
+# Tokenizer és modell betöltése
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=len(set(labels)))
+
+# Tokenek előkészítése
+def tokenize_function(examples):
+    return tokenizer(examples["text"], padding="max_length", truncation=True)
+
+# Adatok dataset formátumba konvertálása
+dataset = Dataset.from_pandas(file_df)
+dataset = dataset.map(tokenize_function, batched=True)
+dataset.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])
+
+
+2.4. Train és test set-ek létrehozása
+
+
+# Train és test set-ek létrehozása
+train_test_split = dataset.train_test_split(test_size=0.2)
+train_dataset = train_test_split['train']
+eval_dataset = train_test_split['test']
+
+
+
+2.5. TrainingArguments beállítása
+
+
+# TrainingArguments beállítása
+training_args = TrainingArguments(
+    output_dir='./results',
+    num_train_epochs=2,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
+    warmup_steps=500,
+    weight_decay=0.01,
+    logging_dir='./logs',
+    logging_steps=10,
+)
+
+
+
+2.6. Trainer betanítása
+
+
+# Trainer inicializálása és betanítása
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset,
+)
+
+trainer.train()
+
+
+# 3. Predikciók készítése
+
+
+# Betanított modell használata predikciók készítésére
+predictions = trainer.predict(eval_dataset)
+
+# Predikciók kiíratása
+print(predictions.predictions)
+
+
+# 4. Teljesítmény értékelése
+
+
+# Értékelés a teszt adatokon
+results = trainer.evaluate(eval_dataset)
+
+# Eredmények kiíratása
+print(results)
+
+
+# 5. Modell mentése
+
+
+# Modell mentése
+trainer.save_model("./saved_model")
+
+
+# 6. Modell kipróbálása
+
+
+import torch
+from transformers import BertForSequenceClassification, BertTokenizer
+
+# Modell elérési útjának meghatározása
+model_path = "./saved_model"
+
+# Modell betöltése
+model = BertForSequenceClassification.from_pretrained(model_path)
+
+# Tokenizátor betöltése
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+
+# Teszt bemenet
+test_sentence = "Macko papa love his little bear"
+
+# Input előkészítése és predikciók végrehajtása
+inputs = tokenizer(test_sentence, return_tensors="pt")
+outputs = model(**inputs)
+logits = outputs.logits
+
+# Logitok Softmax transzformációja
+probabilities = torch.nn.functional.softmax(logits, dim=1)
+
+# Predikciók feldolgozása és kimenet megjelenítése
+predicted_class = torch.argmax(probabilities, dim=1).item()
+class_labels = ["negative", "neutral", "positive"]  # Ez a te osztálycímke listád, aminek az osztályok megfelelnek
+
+predicted_label = class_labels[predicted_class]
+
+print(f"Predicted class: {predicted_label}")
+
+
+# 7. KPI-ok kialakítása a monitorozás érdekében
+
+
+Drift detektálás ADWIN használatával
+
+
+import matplotlib.pyplot as plt
+from river import datasets, drift
+
+# Adatbázis betöltése
+dataset = datasets.Phishing()
+
+# Drift detektor inicializálása
+adwin = drift.ADWIN()
+
+drift_points = []
+
+# Adatok feldolgozása és drift pontok azonosítása
+for i, (x, y) in enumerate(dataset):
+    adwin.update(y)
+    if adwin.drift_detected:
+        drift_points.append(i)
+
+# Drift pontok megjelenítése
+plt.figure(figsize=(10, 6))
+plt.plot(drift_points, [adwin.estimation for _ in drift_points], 'ro', label='Drift')
+plt.title('Drift Detection Using ADWIN')
+plt.xlabel('Data Point Index')
+plt.ylabel('Estimation')
+plt.legend()
+plt.show()
+
+
+Drift detektálás Page-Hinkley használatával
+
+
+import matplotlib.pyplot as plt
+from river import datasets, drift
+
+# Adatbázis betöltése
+dataset = datasets.Phishing()
+
+# Drift detektor inicializálása
+ph = drift.PageHinkley()
+
+drift_points = []
+
+# Adatok feldolgozása és drift pontok azonosítása
+for i, (x, y) in enumerate(dataset):
+    ph.update(y)
+    if ph.drift_detected:
+        drift_points.append(i)
+
+# Drift pontok megjelenítése
+plt.figure(figsize=(10, 6))
+plt.plot(drift_points, [ph.estimation for _ in drift_points], 'ro', label='Drift')
+plt.title('Drift Detection Using Page-Hinkley')
+plt.xlabel('Data Point Index')
+plt.ylabel('Estimation')
+plt.legend()
+plt.show()

@@ -1,0 +1,20 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Users\User> python main.py
+C:\Users\User\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\Users\\User\\main.py': [Errno 2] No such file or directory
+PS C:\Users\User> cd "C:\Users\User\OneDrive\Asztali gép\Feltöltendő beadandó\kész colab 2.0\saved_model"
+PS C:\Users\User\OneDrive\Asztali gép\Feltöltendő beadandó\kész colab 2.0\saved_model> python main.py
+INFO:     Started server process [22876]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:62000 - "POST /predict HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62078 - "POST /predict HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:62081 - "POST /predict HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62087 - "POST /predict HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62091 - "POST /predict HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62094 - "POST /predict HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62096 - "POST /predict HTTP/1.1" 200 OK
